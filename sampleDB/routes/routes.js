@@ -1,0 +1,19 @@
+const express = require('express')
+
+// router object
+const router = new express.Router()
+const user = require('../controllers/userController')
+
+// User creation
+router.post('/user', user.create)
+// get all users
+router.get('/user', user.getAll)
+// get specified user
+router.get('/user/:_id', user.getUser)
+// edit user
+router.put('/user/:_id', user.edit)
+// delete prject
+router.delete(`/user/:_id`, user.delete)
+
+
+module.exports = router

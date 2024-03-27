@@ -1,17 +1,19 @@
 const users = require("../models/userModel")
+const jwt = require('jsonwebtoken');
+
 // user creation
 exports.create = async (req, res) => {
-    const { userName, email } = req.body;
+    const { userName, email, password } = req.body;
 
     try {
-        throw new Error("My error")
+        // throw new Error("My error")
         const existingUser = await users.findOne({ email });
 
         if (existingUser) {
             return res.status(400).json("User alr.");
         } else {
             const newUser = new users({
-                userName, email
+                userName, email, password
             });
 
             await newUser.save();
@@ -84,3 +86,45 @@ exports.delete = async (req, res) => {
     }
 
 }
+
+//login
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const existUser = await users.findOne({ email, password });
+
+        if (existUser) {
+            const token = jwt.sign({ _id: existUser._id }, "supersecretkey123");
+            // console.log(token);
+
+            return res.status(200).json({
+                user: existUser,
+                token
+            });
+            // return res.status(200).json("Login sucessfully")
+        } else {
+            return res.status(404).json("Incorrect email and password");
+        }
+    } catch (err) {
+        return res.status(500).json(`Login API failed: ${err}`);
+    }
+};
+
+exports.getAuthUser = async (req, res) => {
+
+   
+     try {
+        
+        const id=req.payload
+        const user = await users.findById(id);
+        res.send(user);
+        // console.log(user)
+
+    } catch (error) {
+        console.log(error);
+        res.send("An error occured");
+    }
+    
+ 
+};
